@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Evaluación Lógico‑Matemática – 16 preguntas</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;max-width:900px;margin:40px auto;padding:0 16px;line-height:1.5}
+  header{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .card{border:1px solid #ddd;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .muted{color:#555}
+  button{border-radius:12px;border:1px solid #ccc;padding:10px 16px;cursor:pointer}
+  .grid{display:grid;grid-template-columns:1fr;gap:12px}
+  @media (min-width: 720px){ .grid{grid-template-columns:1fr 1fr} }
+  .success{background:#f0fff4;border:1px solid #c6f6d5}
+  .danger{background:#fff5f5;border:1px solid #fed7d7}
+  .footer-note{font-size:.9rem;color:#666}
+</style>
+</head>
+<body>
+  <header>
+    <h1>Evaluación Lógico‑Matemática</h1>
+    <p class="muted">Cuestionario virtual auto‑calificable (16 preguntas).</p>
+  </header>
+
+  <section class="card">
+    <div class="grid">
+      <label>Nombre completo<br><input id="nombre" type="text" style="width:100%" placeholder="Escribe tu nombre" required></label>
+      <label>Correo electrónico<br><input id="email" type="email" style="width:100%" placeholder="tucorreo@ejemplo.com" required></label>
+    </div>
+  </section>
+
+  <form id="quiz"></form>
+
+  <section class="card">
+    <div class="grid">
+      <button type="button" id="btnCalificar">Calificar</button>
+      <button type="button" id="btnCSV">Descargar calificaciones (CSV)</button>
+      <button type="button" id="btnLimpiar">Limpiar intento</button>
+    </div>
+    <p class="footer-note">Comparte este archivo como enlace (p. ej., en GitHub Pages o tu LMS) o súbelo a una plataforma que sirva archivos HTML. El botón CSV guarda los resultados locales en tu dispositivo.</p>
+  </section>
+
+  <section id="resultado"></section>
+
+<script>
+const DATA = [
+  {
+    "title": "1) Una docena de galletas y un pan cuestan 120 colones. Media docena de galletas y dos panes cuestan 120 colones. ¿Cuánto vale un pan?",
+    "options": [
+      "A) 50 colones",
+      "B) 40 colones",
+      "C) 60 colones",
+      "D) 80 colones"
+    ],
+    "answer_index": 1
+  },
+  {
+    "title": "2) Ricardo le dio a Roberto la mitad de sus galletas y media más. Le quedaron 7 galletas. ¿Cuántas recibió Roberto?",
+    "options": [
+      "A) 6",
+      "B) 8",
+      "C) 7.5",
+      "D) 8.5"
+    ],
+    "answer_index": 1
+  },
+  {
+    "title": "3) Micifuz tiene 2/3 de la edad de Bigotes. La diferencia entre sus edades es de 4 años. ¿Qué edad tiene Bigotes?",
+    "options": [
+      "A) 4 años",
+      "B) 6 años",
+      "C) 8 años",
+      "D) 12 años"
+    ],
+    "answer_index": 3
+  },
+  {
+    "title": "4) Un equipo de básquet ganó 4 partidos más de los que perdió. Si ganó 3/5 de sus encuentros. ¿Cuántos partidos jugó?",
+    "options": [
+      "A) 12",
+      "B) 16",
+      "C) 20",
+      "D) 24"
+    ],
+    "answer_index": 2
+  },
+  {
+    "title": "5) Si cuatro limones pesan lo que pesa una naranja, y dos naranjas más tres limones pesan 88 gramos, ¿cuánto pesa un limón?",
+    "options": [
+      "A) 8 g",
+      "B) 11 g",
+      "C) 32 g",
+      "D) 64 g"
+    ],
+    "answer_index": 0
+  },
+  {
+    "title": "6) Una corbata y una camisa cuestan ¢5000. La camisa vale ¢2000 más que la corbata, ¿cuánto vale la camisa?",
+    "options": [
+      "A) 2000 colones",
+      "B) 3000 colones",
+      "C) 3500 colones",
+      "D) 4000 colones"
+    ],
+    "answer_index": 2
+  },
+  {
+    "title": "7) La cabeza de un pez mide 10 cm; la cola es tan larga como la cabeza más la mitad del cuerpo; el cuerpo es tan largo como la cabeza y la cola juntas. ¿Cuánto mide el pez?",
+    "options": [
+      "A) 40 cm",
+      "B) 50 cm",
+      "C) 60 cm",
+      "D) 80 cm"
+    ],
+    "answer_index": 3
+  },
+  {
+    "title": "8) En el salón A hay 6 niños más que en el salón B. Si 5 niños pasan del salón A al B, entonces en el salón B hay el doble de niños que en el A. ¿Cuántos había al principio en el salón A?",
+    "options": [
+      "A) 6",
+      "B) 7",
+      "C) 9",
+      "D) 12"
+    ],
+    "answer_index": 2
+  },
+  {
+    "title": "10) En el salón A hay 7 niñas más que en el B. Si una niña del salón B se pasa para el A, entonces en el A hay el doble de niñas que en el B. ¿Cuántas niñas hay en total?",
+    "options": [
+      "A) 17",
+      "B) 10",
+      "C) 27",
+      "D) 24"
+    ],
+    "answer_index": 2
+  },
+  {
+    "title": "11) Una manzana y una naranja valen ¢200. Si la manzana vale ¢150 más que la naranja, ¿cuánto vale la naranja?",
+    "options": [
+      "A) ¢50",
+      "B) ¢25",
+      "C) ¢30",
+      "D) ¢75"
+    ],
+    "answer_index": 1
+  },
+  {
+    "title": "12) Un reloj da las dos con dos campanadas en dos segundos. ¿En cuántos segundos da las cuatro?",
+    "options": [
+      "A) 4 segundos",
+      "B) 5 segundos",
+      "C) 6 segundos",
+      "D) 8 segundos"
+    ],
+    "answer_index": 2
+  },
+  {
+    "title": "14) Las edades (años cumplidos) de un hijo y su padre están en la razón 2 a 9 y ambas edades suman 44 años. ¿Cuál es la edad del padre?",
+    "options": [
+      "A) 24",
+      "B) 30",
+      "C) 34",
+      "D) 36"
+    ],
+    "answer_index": 3
+  },
+  {
+    "title": "16) En una fábrica, 6 de cada 15 camisas tienen defectos. Si hay 120 camisas defectuosas, ¿cuántas camisas hay en buen estado?",
+    "options": [
+      "A) 80",
+      "B) 120",
+      "C) 180",
+      "D) 300"
+    ],
+    "answer_index": 2
+  },
+  {
+    "title": "17) A una excursión fueron 432 estudiantes de una misma escuela. Si los que asistieron representan el 54% del total de estudiantes de esa institución, entonces el total de alumnos de la escuela es:",
+    "options": [
+      "A) 600",
+      "B) 120",
+      "C) 800",
+      "D) 832"
+    ],
+    "answer_index": 2
+  },
+  {
+    "title": "20) 15 de cada 24 empleados en una empresa se trasladan en autobús. Si en la empresa hay 99 empleados que usan otro medio de transporte, entonces el número de empleados en la empresa es:",
+    "options": [
+      "A) 165",
+      "B) 175",
+      "C) 264",
+      "D) 364"
+    ],
+    "answer_index": 2
+  },
+  {
+    "title": "31) Tenía 90 colones, perdí los 3/5 y presté 5/6 del resto. ¿Cuánto me queda?",
+    "options": [
+      "A) 5",
+      "B) 6",
+      "C) 7",
+      "D) 8"
+    ],
+    "answer_index": 1
+  }
+];
+
+const formEl = document.getElementById('quiz');
+const resultEl = document.getElementById('resultado');
+
+function render() {
+  formEl.innerHTML = "";
+  DATA.forEach((q, i) => {
+    const card = document.createElement('section');
+    card.className = "card";
+    const h = document.createElement('h3');
+    h.textContent = q.title;
+    card.appendChild(h);
+
+    q.options.forEach((opt, j) => {
+      const id = `q${i}o${j}`;
+      const label = document.createElement('label');
+      label.style.display = "block";
+      const radio = document.createElement('input');
+      radio.type = "radio";
+      radio.name = `q${i}`;
+      radio.value = opt;
+      radio.id = id;
+      label.appendChild(radio);
+      const span = document.createElement('span');
+      span.textContent = " " + opt;
+      label.appendChild(span);
+      card.appendChild(label);
+    });
+    formEl.appendChild(card);
+  });
+}
+
+function calificar() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const email = document.getElementById('email').value.trim();
+  if(!nombre || !email) {
+    alert("Por favor escribe tu nombre y correo.");
+    return;
+  }
+  let correctas = 0;
+  const detalle = [];
+  DATA.forEach((q, i) => {
+    const sel = (new FormData(formEl)).get(`q${i}`);
+    const correcta = q.options[q.answer_index];
+    const ok = sel === correcta;
+    if (ok) correctas += 1;
+    detalle.push({pregunta: q.title, respuesta: sel || "", correcta});
+  });
+  const puntaje = correctas;
+  const total = DATA.length;
+  const pct = Math.round(100*puntaje/total);
+
+  const card = document.createElement('section');
+  card.className = "card " + (pct>=60 ? "success":"danger");
+  const h2 = document.createElement('h2');
+  h2.textContent = `Resultado: ${puntaje} / ${total} (${pct}%)`;
+  card.appendChild(h2);
+  const ul = document.createElement('ul');
+  detalle.forEach((d, idx) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>P${idx+1}:</strong> Tu respuesta: <em>${d.respuesta||"—"}</em> • Correcta: <em>${d.correcta}</em>`;
+    ul.appendChild(li);
+  });
+  card.appendChild(ul);
+  resultEl.innerHTML = "";
+  resultEl.appendChild(card);
+
+  // Guardar intento en localStorage para exportar CSV
+  const attempts = JSON.parse(localStorage.getItem("quiz_attempts")||"[]");
+  attempts.push({
+    timestamp: new Date().toISOString(),
+    nombre, email, puntaje, total, porcentaje: pct, detalle
+  });
+  localStorage.setItem("quiz_attempts", JSON.stringify(attempts));
+}
+
+document.getElementById('btnCalificar').addEventListener('click', calificar);
+
+document.getElementById('btnCSV').addEventListener('click', () => {
+  const rows = JSON.parse(localStorage.getItem("quiz_attempts")||"[]");
+  if (!rows.length) { alert("No hay intentos guardados todavía."); return; }
+  const baseCols = ["timestamp","nombre","email","puntaje","total","porcentaje"];
+  const qCols = DATA.map((q,i)=>`P${i+1}`);
+  const cols = baseCols.concat(qCols);
+  const escape = v => ('"'+String(v).replace(/"/g,'""')+'"');
+  const lines = [cols.map(escape).join(",")];
+  rows.forEach(r=>{
+    const ans = r.detalle.map(d=>d.respuesta);
+    const row = [r.timestamp, r.nombre, r.email, r.puntaje, r.total, r.porcentaje].concat(ans);
+    lines.push(row.map(escape).join(","));
+  });
+  const csv = lines.join("\n");
+  const blob = new Blob([csv], {type:"text/csv"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "calificaciones_quiz.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('btnLimpiar').addEventListener('click', () => {
+  localStorage.removeItem("quiz_attempts");
+  alert("Intentos locales eliminados.");
+});
+
+render();
+</script>
+</body>
+</html>
